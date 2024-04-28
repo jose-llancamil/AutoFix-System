@@ -1,0 +1,141 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > RepairRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.autofix.repairmanagementsystem.repositories</a>
+</div>
+
+<h1>Coverage Summary for Class: RepairRepository (com.autofix.repairmanagementsystem.repositories)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+</tr>
+  <tr>
+    <td class="name">RepairRepository$MockitoMock$lunVO3Hj</td>
+  </tr>
+  <tr>
+    <td class="name">RepairRepository$MockitoMock$lunVO3Hj$auxiliary$dHEKwUQH</td>
+  </tr>
+  <tr>
+    <td class="name">RepairRepository$MockitoMock$lunVO3Hj$auxiliary$zwTlwKnX</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.autofix.repairmanagementsystem.repositories;
+&nbsp;
+&nbsp;import com.autofix.repairmanagementsystem.dto.AverageRepairTimeDTO;
+&nbsp;import com.autofix.repairmanagementsystem.dto.RepairTypeMotorSummaryDTO;
+&nbsp;import com.autofix.repairmanagementsystem.dto.RepairTypeSummaryDTO;
+&nbsp;import com.autofix.repairmanagementsystem.entities.RepairEntity;
+&nbsp;import org.springframework.data.jpa.repository.JpaRepository;
+&nbsp;import org.springframework.data.jpa.repository.Query;
+&nbsp;import org.springframework.data.repository.query.Param;
+&nbsp;import org.springframework.stereotype.Repository;
+&nbsp;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@Repository
+&nbsp;public interface RepairRepository extends JpaRepository&lt;RepairEntity, Long&gt; {
+&nbsp;    // Encuentra reparaciones dentro de un rango de fechas
+&nbsp;    List&lt;RepairEntity&gt; findByEntryDateBetween(LocalDate start, LocalDate end);
+&nbsp;
+&nbsp;    // Método para encontrar reparaciones por el ID del vehículo
+&nbsp;    List&lt;RepairEntity&gt; findByVehicleVehicleId(Long vehicleId);
+&nbsp;
+&nbsp;    // Obtener el costo total de las reparaciones para un vehículo específico
+&nbsp;    @Query(&quot;SELECT SUM(r.repairCost) FROM RepairEntity r WHERE r.vehicle.vehicleId = :vehicleId&quot;)
+&nbsp;    Double findTotalRepairCostByVehicleId(Long vehicleId);
+&nbsp;
+&nbsp;    // Obtener el número de reparaciones por vehículo
+&nbsp;    @Query(&quot;SELECT COUNT(r) FROM RepairEntity r WHERE r.vehicle.vehicleId = :vehicleId AND r.entryDate &gt;= :startDate&quot;)
+&nbsp;    Long countRepairsByVehicleIdAndDateRange(@Param(&quot;vehicleId&quot;) Long vehicleId, @Param(&quot;startDate&quot;) LocalDate startDate);
+&nbsp;
+&nbsp;    @Query(&quot;SELECT new com.autofix.repairmanagementsystem.dto.RepairTypeSummaryDTO(rt.description, COUNT(DISTINCT v.type), SUM(r.repairCost)) &quot; +
+&nbsp;            &quot;FROM RepairEntity r &quot; +
+&nbsp;            &quot;JOIN r.vehicle v &quot; +
+&nbsp;            &quot;JOIN r.repairType rt &quot; +
+&nbsp;            &quot;GROUP BY rt.description &quot; +
+&nbsp;            &quot;ORDER BY SUM(r.repairCost) DESC&quot;)
+&nbsp;    List&lt;RepairTypeSummaryDTO&gt; findRepairTypesSummary();
+&nbsp;
+&nbsp;    @Query(&quot;SELECT new com.autofix.repairmanagementsystem.dto.AverageRepairTimeDTO(v.brand, AVG(TIMESTAMPDIFF(DAY, r.entryDate, r.exitDate))) &quot; +
+&nbsp;            &quot;FROM RepairEntity r JOIN r.vehicle v &quot; +
+&nbsp;            &quot;GROUP BY v.brand &quot; +
+&nbsp;            &quot;ORDER BY AVG(TIMESTAMPDIFF(DAY, r.entryDate, r.exitDate)) ASC&quot;)
+&nbsp;    List&lt;AverageRepairTimeDTO&gt; findAverageRepairTimesByBrand();
+&nbsp;
+&nbsp;    @Query(&quot;SELECT new com.autofix.repairmanagementsystem.dto.RepairTypeMotorSummaryDTO(&quot; +
+&nbsp;            &quot;rt.description, v.engineType, COUNT(v), &quot; +
+&nbsp;            &quot;CAST(SUM(CASE &quot; +
+&nbsp;            &quot;WHEN v.engineType = &#39;Gasoline&#39; THEN rt.baseCostGasoline &quot; +
+&nbsp;            &quot;WHEN v.engineType = &#39;Diesel&#39; THEN rt.baseCostDiesel &quot; +
+&nbsp;            &quot;WHEN v.engineType = &#39;Hybrid&#39; THEN rt.baseCostHybrid &quot; +
+&nbsp;            &quot;WHEN v.engineType = &#39;Electric&#39; THEN rt.baseCostElectric &quot; +
+&nbsp;            &quot;ELSE 0 END) AS Long)) &quot; +
+&nbsp;            &quot;FROM RepairEntity r &quot; +
+&nbsp;            &quot;JOIN r.vehicle v &quot; +
+&nbsp;            &quot;JOIN r.repairType rt &quot; +
+&nbsp;            &quot;GROUP BY rt.description, v.engineType &quot; +
+&nbsp;            &quot;ORDER BY SUM(CASE &quot; +
+&nbsp;            &quot;WHEN v.engineType = &#39;Gasoline&#39; THEN rt.baseCostGasoline &quot; +
+&nbsp;            &quot;WHEN v.engineType = &#39;Diesel&#39; THEN rt.baseCostDiesel &quot; +
+&nbsp;            &quot;WHEN v.engineType = &#39;Hybrid&#39; THEN rt.baseCostHybrid &quot; +
+&nbsp;            &quot;WHEN v.engineType = &#39;Electric&#39; THEN rt.baseCostElectric &quot; +
+&nbsp;            &quot;ELSE 0 END) DESC&quot;)
+&nbsp;    List&lt;RepairTypeMotorSummaryDTO&gt; findRepairTypesAndEngineSummary();
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-19 04:46</div>
+</div>
+</body>
+</html>

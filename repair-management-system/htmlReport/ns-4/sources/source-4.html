@@ -1,0 +1,174 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > RepairEntity</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.autofix.repairmanagementsystem.entities</a>
+</div>
+
+<h1>Coverage Summary for Class: RepairEntity (com.autofix.repairmanagementsystem.entities)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RepairEntity</td>
+<td class="coverageStat">
+  <span class="percent">
+    71,4%
+  </span>
+  <span class="absValue">
+    (10/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    71,4%
+  </span>
+  <span class="absValue">
+    (10/14)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RepairEntity$HibernateInstantiator$fpSMM689</td>
+  </tr>
+  <tr>
+    <td class="name">RepairEntity$HibernateProxy$em3kA5rH</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    71,4%
+  </span>
+  <span class="absValue">
+    (10/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    71,4%
+  </span>
+  <span class="absValue">
+    (10/14)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.autofix.repairmanagementsystem.entities;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.annotation.JsonBackReference;
+&nbsp;import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+&nbsp;import jakarta.persistence.*;
+&nbsp;import lombok.AllArgsConstructor;
+&nbsp;import lombok.Data;
+&nbsp;import lombok.NoArgsConstructor;
+&nbsp;
+&nbsp;import java.math.BigDecimal;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.time.LocalTime;
+&nbsp;
+&nbsp;@Entity
+&nbsp;@Table(name = &quot;repairs&quot;)
+&nbsp;@JsonIgnoreProperties({&quot;hibernateLazyInitializer&quot;, &quot;handler&quot;})
+<b class="fc">&nbsp;@Data</b>
+<b class="fc">&nbsp;@NoArgsConstructor</b>
+<b class="nc">&nbsp;@AllArgsConstructor</b>
+&nbsp;public class RepairEntity {
+&nbsp;    @Id
+&nbsp;    @GeneratedValue(strategy = GenerationType.IDENTITY)
+<b class="fc">&nbsp;    private Long repairId;</b>
+&nbsp;
+&nbsp;    @ManyToOne(fetch = FetchType.LAZY)
+&nbsp;    @JoinColumn(name = &quot;vehicle_id&quot;, nullable = false)
+&nbsp;    @JsonBackReference(&quot;vehicle-repair&quot;)
+<b class="fc">&nbsp;    private VehicleEntity vehicle;</b>
+&nbsp;
+&nbsp;    @Column(name = &quot;entry_date&quot;, nullable = false)
+<b class="fc">&nbsp;    private LocalDate entryDate;</b>
+&nbsp;
+&nbsp;    @Column(name = &quot;status&quot;)
+<b class="nc">&nbsp;    private String status;</b>
+&nbsp;
+&nbsp;    @Column(name = &quot;entry_time&quot;, nullable = false)
+<b class="fc">&nbsp;    private LocalTime entryTime;</b>
+&nbsp;
+&nbsp;    @ManyToOne(fetch = FetchType.LAZY)
+&nbsp;    @JoinColumn(name = &quot;repair_type_id&quot;, nullable = false)
+<b class="fc">&nbsp;    private RepairTypeEntity repairType;</b>
+&nbsp;
+&nbsp;    @Column(name = &quot;repair_cost&quot;, nullable = false)
+<b class="fc">&nbsp;    private BigDecimal repairCost;</b>
+&nbsp;
+&nbsp;    @Column(name = &quot;exit_date&quot;, nullable = false)
+<b class="fc">&nbsp;    private LocalDate exitDate;</b>
+&nbsp;
+&nbsp;    @Column(name = &quot;exit_time&quot;, nullable = false)
+<b class="nc">&nbsp;    private LocalTime exitTime;</b>
+&nbsp;
+&nbsp;    @Column(name = &quot;customer_pickup_date&quot;, nullable = false)
+<b class="fc">&nbsp;    private LocalDate customerPickupDate;</b>
+&nbsp;
+&nbsp;    @Column(name = &quot;customer_pickup_time&quot;, nullable = false)
+<b class="nc">&nbsp;    private LocalTime customerPickupTime;</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-19 04:46</div>
+</div>
+</body>
+</html>

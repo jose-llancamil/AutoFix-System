@@ -1,0 +1,168 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ChargeController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.autofix.repairmanagementsystem.controllers</a>
+</div>
+
+<h1>Coverage Summary for Class: ChargeController (com.autofix.repairmanagementsystem.controllers)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ChargeController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    68,4%
+  </span>
+  <span class="absValue">
+    (13/19)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.autofix.repairmanagementsystem.controllers;
+&nbsp;
+&nbsp;import com.autofix.repairmanagementsystem.entities.ChargeEntity;
+&nbsp;import com.autofix.repairmanagementsystem.services.ChargeService;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/api/v1/charges&quot;)
+&nbsp;public class ChargeController {
+&nbsp;
+&nbsp;    private final ChargeService chargeService;
+&nbsp;
+&nbsp;    @Autowired
+<b class="fc">&nbsp;    public ChargeController(ChargeService chargeService) {</b>
+<b class="fc">&nbsp;        this.chargeService = chargeService;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PostMapping
+&nbsp;    public ResponseEntity&lt;ChargeEntity&gt; createCharge(@RequestBody ChargeEntity charge) {
+&nbsp;        try {
+<b class="fc">&nbsp;            ChargeEntity savedCharge = chargeService.createCharge(charge);</b>
+<b class="fc">&nbsp;            return ResponseEntity.ok(savedCharge);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().build();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping
+&nbsp;    public ResponseEntity&lt;List&lt;ChargeEntity&gt;&gt; getAllCharges() {
+<b class="fc">&nbsp;        List&lt;ChargeEntity&gt; charges = chargeService.findAllCharges();</b>
+<b class="fc">&nbsp;        return charges.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(charges);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;ChargeEntity&gt; getChargeById(@PathVariable Long id) {
+<b class="fc">&nbsp;        return chargeService.findChargeById(id)</b>
+<b class="fc">&nbsp;                .map(ResponseEntity::ok)</b>
+<b class="fc">&nbsp;                .orElseGet(() -&gt; ResponseEntity.notFound().build());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PutMapping(&quot;/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;ChargeEntity&gt; updateCharge(@PathVariable Long id, @RequestBody ChargeEntity charge) {
+&nbsp;        try {
+<b class="fc">&nbsp;            ChargeEntity updatedCharge = chargeService.updateCharge(id, charge);</b>
+<b class="fc">&nbsp;            return ResponseEntity.ok(updatedCharge);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().build();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @DeleteMapping(&quot;/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;Void&gt; deleteCharge(@PathVariable Long id) {
+&nbsp;        try {
+<b class="fc">&nbsp;            chargeService.deleteCharge(id);</b>
+<b class="fc">&nbsp;            return ResponseEntity.noContent().build();</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.internalServerError().build();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-19 04:46</div>
+</div>
+</body>
+</html>

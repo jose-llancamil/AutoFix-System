@@ -1,0 +1,162 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > VehicleService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.autofix.repairmanagementsystem.services</a>
+</div>
+
+<h1>Coverage Summary for Class: VehicleService (com.autofix.repairmanagementsystem.services)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">VehicleService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    77,8%
+  </span>
+  <span class="absValue">
+    (14/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.autofix.repairmanagementsystem.services;
+&nbsp;
+&nbsp;import com.autofix.repairmanagementsystem.entities.VehicleEntity;
+&nbsp;import com.autofix.repairmanagementsystem.repositories.VehicleRepository;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;import org.springframework.transaction.annotation.Transactional;
+&nbsp;
+&nbsp;import java.time.Year;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;@Service
+&nbsp;public class VehicleService {
+&nbsp;
+&nbsp;    private final VehicleRepository vehicleRepository;
+&nbsp;
+&nbsp;    @Autowired
+<b class="fc">&nbsp;    public VehicleService(VehicleRepository vehicleRepository) {</b>
+<b class="fc">&nbsp;        this.vehicleRepository = vehicleRepository;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    public VehicleEntity registerOrUpdateVehicle(VehicleEntity vehicle) throws Exception {
+<b class="fc">&nbsp;        int currentYear = Year.now().getValue();</b>
+<b class="fc">&nbsp;        if (vehicle.getManufactureYear() &lt; 1970 || vehicle.getManufactureYear() &gt; currentYear) {</b>
+<b class="fc">&nbsp;            throw new IllegalArgumentException(&quot;El año de fabricación del vehículo está fuera del rango permitido.&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (vehicle.getVehicleId() != null) {</b>
+<b class="fc">&nbsp;            if (!vehicleRepository.existsById(vehicle.getVehicleId())) {</b>
+<b class="fc">&nbsp;                throw new Exception(&quot;El vehículo con ID &quot; + vehicle.getVehicleId() + &quot; no existe.&quot;);</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            Optional&lt;VehicleEntity&gt; existingVehicle = vehicleRepository.findByLicensePlateNumber(vehicle.getLicensePlateNumber());</b>
+<b class="nc">&nbsp;            if (existingVehicle.isPresent()) {</b>
+<b class="nc">&nbsp;                throw new Exception(&quot;El número de placa ya está registrado: &quot; + vehicle.getLicensePlateNumber());</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return vehicleRepository.save(vehicle);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;VehicleEntity&gt; findAllVehicles() {
+<b class="fc">&nbsp;        return vehicleRepository.findAll();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public VehicleEntity findVehicleById(Long vehicleId) throws Exception {
+<b class="fc">&nbsp;        return vehicleRepository.findById(vehicleId).orElseThrow(() -&gt; new Exception(&quot;Vehículo no encontrado con ID: &quot; + vehicleId));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    public void deleteVehicle(Long vehicleId) throws Exception {
+<b class="fc">&nbsp;        VehicleEntity vehicle = findVehicleById(vehicleId);</b>
+<b class="fc">&nbsp;        if (!vehicle.getRepairs().isEmpty()) {</b>
+<b class="fc">&nbsp;            throw new Exception(&quot;El vehículo tiene reparaciones pendientes y no puede ser eliminado.&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        vehicleRepository.deleteById(vehicleId);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-19 04:46</div>
+</div>
+</body>
+</html>

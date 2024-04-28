@@ -1,0 +1,299 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ChargeService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.autofix.repairmanagementsystem.services</a>
+</div>
+
+<h1>Coverage Summary for Class: ChargeService (com.autofix.repairmanagementsystem.services)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ChargeService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87,5%
+  </span>
+  <span class="absValue">
+    (7/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    30,3%
+  </span>
+  <span class="absValue">
+    (40/132)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.autofix.repairmanagementsystem.services;
+&nbsp;
+&nbsp;import com.autofix.repairmanagementsystem.entities.ChargeEntity;
+&nbsp;import com.autofix.repairmanagementsystem.repositories.ChargeRepository;
+&nbsp;import com.autofix.repairmanagementsystem.repositories.VehicleRepository;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;import org.springframework.transaction.annotation.Transactional;
+&nbsp;
+&nbsp;import java.math.BigDecimal;
+&nbsp;import java.time.Year;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;@Service
+&nbsp;public class ChargeService {
+&nbsp;
+&nbsp;    private final ChargeRepository chargeRepository;
+&nbsp;    private final VehicleRepository vehicleRepository;
+&nbsp;
+&nbsp;    @Autowired
+<b class="fc">&nbsp;    public ChargeService(ChargeRepository chargeRepository, VehicleRepository vehicleRepository) {</b>
+<b class="fc">&nbsp;        this.chargeRepository = chargeRepository;</b>
+<b class="fc">&nbsp;        this.vehicleRepository = vehicleRepository;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    public ChargeEntity createCharge(ChargeEntity charge) {
+<b class="fc">&nbsp;        return chargeRepository.save(charge);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;ChargeEntity&gt; findAllCharges() {
+<b class="fc">&nbsp;        return chargeRepository.findAll();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;ChargeEntity&gt; findChargeById(Long id) {
+<b class="fc">&nbsp;        return chargeRepository.findById(id);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    public ChargeEntity updateCharge(Long id, ChargeEntity chargeDetails) {
+<b class="fc">&nbsp;        ChargeEntity charge = chargeRepository.findById(id)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new RuntimeException(&quot;Carga no encontrada con el ID: &quot; + id));</b>
+<b class="fc">&nbsp;        charge.setDescription(chargeDetails.getDescription());</b>
+<b class="fc">&nbsp;        charge.setAmount(chargeDetails.getAmount());</b>
+<b class="fc">&nbsp;        charge.setChargeType(chargeDetails.getChargeType());</b>
+<b class="fc">&nbsp;        charge.setApplicableType(chargeDetails.getApplicableType());</b>
+<b class="fc">&nbsp;        return chargeRepository.save(charge);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    public void deleteCharge(Long id) {
+<b class="nc">&nbsp;        chargeRepository.deleteById(id);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BigDecimal determineMileageChargePercentage(Long vehicleId) {
+<b class="fc">&nbsp;        Integer mileage = vehicleRepository.findById(vehicleId)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new RuntimeException(&quot;Vehículo no encontrado con el ID: &quot; + vehicleId))</b>
+<b class="fc">&nbsp;                .getMileage();</b>
+<b class="fc">&nbsp;        String vehicleType = vehicleRepository.findById(vehicleId)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new RuntimeException(&quot;Vehículo no encontrado con el ID: &quot; + vehicleId))</b>
+<b class="fc">&nbsp;                .getType();</b>
+<b class="fc">&nbsp;        BigDecimal mileageChargePercentage = BigDecimal.ZERO;</b>
+&nbsp;
+<b class="fc">&nbsp;        if (vehicleType.equalsIgnoreCase(&quot;Sedan&quot;)) {</b>
+<b class="fc">&nbsp;            if (mileage &gt;= 0 &amp;&amp; mileage &lt;= 5000) {</b>
+<b class="nc">&nbsp;                mileageChargePercentage = new BigDecimal(&quot;0.0&quot;);</b>
+<b class="fc">&nbsp;            } else if (mileage &gt;= 5001 &amp;&amp; mileage &lt;= 12000) {</b>
+<b class="nc">&nbsp;                mileageChargePercentage = new BigDecimal(&quot;3.0&quot;);</b>
+<b class="fc">&nbsp;            } else if (mileage &gt;= 12001 &amp;&amp; mileage &lt;= 25000) {</b>
+<b class="fc">&nbsp;                mileageChargePercentage = new BigDecimal(&quot;7.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (mileage &gt;= 25001 &amp;&amp; mileage &lt;= 40000) {</b>
+<b class="nc">&nbsp;                mileageChargePercentage = new BigDecimal(&quot;12.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (mileage &gt;= 40000) {</b>
+<b class="nc">&nbsp;                mileageChargePercentage = new BigDecimal(&quot;20.0&quot;);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;        } else if (vehicleType.equalsIgnoreCase(&quot;Hatchback&quot;)) {</b>
+<b class="nc">&nbsp;            if (mileage &gt;= 0 &amp;&amp; mileage &lt;= 5000) {</b>
+<b class="nc">&nbsp;                mileageChargePercentage = new BigDecimal(&quot;0.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (mileage &gt;= 5001 &amp;&amp; mileage &lt;= 12000) {</b>
+<b class="nc">&nbsp;                mileageChargePercentage = new BigDecimal(&quot;3.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (mileage &gt;= 12001 &amp;&amp; mileage &lt;= 25000) {</b>
+<b class="nc">&nbsp;                mileageChargePercentage = new BigDecimal(&quot;7.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (mileage &gt;= 25001 &amp;&amp; mileage &lt;= 40000) {</b>
+<b class="nc">&nbsp;                mileageChargePercentage = new BigDecimal(&quot;12.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (mileage &gt;= 40000) {</b>
+<b class="nc">&nbsp;                mileageChargePercentage = new BigDecimal(&quot;20.0&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (vehicleType.equalsIgnoreCase(&quot;SUV&quot;)) {</b>
+<b class="nc">&nbsp;            if (mileage &gt;= 0 &amp;&amp; mileage &lt;= 5000) {</b>
+<b class="nc">&nbsp;                mileageChargePercentage = new BigDecimal(&quot;0.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (mileage &gt;= 5001 &amp;&amp; mileage &lt;= 12000) {</b>
+<b class="nc">&nbsp;                mileageChargePercentage = new BigDecimal(&quot;5.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (mileage &gt;= 12001 &amp;&amp; mileage &lt;= 25000) {</b>
+<b class="nc">&nbsp;                mileageChargePercentage = new BigDecimal(&quot;9.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (mileage &gt;= 25001 &amp;&amp; mileage &lt;= 40000) {</b>
+<b class="nc">&nbsp;                mileageChargePercentage = new BigDecimal(&quot;12.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (mileage &gt;= 40000) {</b>
+<b class="nc">&nbsp;                mileageChargePercentage = new BigDecimal(&quot;20.0&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (vehicleType.equalsIgnoreCase(&quot;Pickup&quot;)) {</b>
+<b class="nc">&nbsp;            if (mileage &gt;= 0 &amp;&amp; mileage &lt;= 5000) {</b>
+<b class="nc">&nbsp;                mileageChargePercentage = new BigDecimal(&quot;0.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (mileage &gt;= 5001 &amp;&amp; mileage &lt;= 12000) {</b>
+<b class="nc">&nbsp;                mileageChargePercentage = new BigDecimal(&quot;5.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (mileage &gt;= 12001 &amp;&amp; mileage &lt;= 25000) {</b>
+<b class="nc">&nbsp;                mileageChargePercentage = new BigDecimal(&quot;9.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (mileage &gt;= 25001 &amp;&amp; mileage &lt;= 40000) {</b>
+<b class="nc">&nbsp;                mileageChargePercentage = new BigDecimal(&quot;12.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (mileage &gt;= 40000) {</b>
+<b class="nc">&nbsp;                mileageChargePercentage = new BigDecimal(&quot;20.0&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (vehicleType.equalsIgnoreCase(&quot;Furgoneta&quot;)) {</b>
+<b class="nc">&nbsp;            if (mileage &gt;= 0 &amp;&amp; mileage &lt;= 5000) {</b>
+<b class="nc">&nbsp;                mileageChargePercentage = new BigDecimal(&quot;0.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (mileage &gt;= 5001 &amp;&amp; mileage &lt;= 12000) {</b>
+<b class="nc">&nbsp;                mileageChargePercentage = new BigDecimal(&quot;5.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (mileage &gt;= 12001 &amp;&amp; mileage &lt;= 25000) {</b>
+<b class="nc">&nbsp;                mileageChargePercentage = new BigDecimal(&quot;9.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (mileage &gt;= 25001 &amp;&amp; mileage &lt;= 40000) {</b>
+<b class="nc">&nbsp;                mileageChargePercentage = new BigDecimal(&quot;12.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (mileage &gt;= 40000) {</b>
+<b class="nc">&nbsp;                mileageChargePercentage = new BigDecimal(&quot;20.0&quot;);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return mileageChargePercentage;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BigDecimal determineAntiquityChargePercentage(Long vehicleId) {
+<b class="fc">&nbsp;        Integer manufactureYear = vehicleRepository.findById(vehicleId)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new RuntimeException(&quot;Vehículo no encontrado con el ID: &quot; + vehicleId))</b>
+<b class="fc">&nbsp;                .getManufactureYear();</b>
+<b class="fc">&nbsp;        String vehicleType = vehicleRepository.findById(vehicleId)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new RuntimeException(&quot;Vehículo no encontrado con el ID: &quot; + vehicleId))</b>
+<b class="fc">&nbsp;                .getType();</b>
+<b class="fc">&nbsp;        int currentYear = Year.now().getValue();</b>
+<b class="fc">&nbsp;        int vehicleAge = currentYear - manufactureYear;</b>
+<b class="fc">&nbsp;        BigDecimal antiquityChargePercentage = BigDecimal.ZERO;</b>
+&nbsp;
+<b class="fc">&nbsp;        if (vehicleType.equalsIgnoreCase(&quot;Sedan&quot;)) {</b>
+<b class="fc">&nbsp;            if (vehicleAge &gt;= 0 &amp;&amp; vehicleAge &lt;= 5) {</b>
+<b class="nc">&nbsp;                antiquityChargePercentage = new BigDecimal(&quot;0.0&quot;);</b>
+<b class="fc">&nbsp;            } else if (vehicleAge &gt;= 6 &amp;&amp; vehicleAge &lt;= 10) {</b>
+<b class="fc">&nbsp;                antiquityChargePercentage = new BigDecimal(&quot;5.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (vehicleAge &gt;= 11 &amp;&amp; vehicleAge &lt;= 15) {</b>
+<b class="nc">&nbsp;                antiquityChargePercentage = new BigDecimal(&quot;9.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (vehicleAge &gt;= 16) {</b>
+<b class="nc">&nbsp;                antiquityChargePercentage = new BigDecimal(&quot;15.0&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (vehicleType.equalsIgnoreCase(&quot;Hatchback&quot;)) {</b>
+<b class="nc">&nbsp;            if (vehicleAge &gt;= 0 &amp;&amp; vehicleAge &lt;= 5) {</b>
+<b class="nc">&nbsp;                antiquityChargePercentage = new BigDecimal(&quot;0.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (vehicleAge &gt;= 6 &amp;&amp; vehicleAge &lt;= 10) {</b>
+<b class="nc">&nbsp;                antiquityChargePercentage = new BigDecimal(&quot;5.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (vehicleAge &gt;= 11 &amp;&amp; vehicleAge &lt;= 15) {</b>
+<b class="nc">&nbsp;                antiquityChargePercentage = new BigDecimal(&quot;9.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (vehicleAge &gt;= 16) {</b>
+<b class="nc">&nbsp;                antiquityChargePercentage = new BigDecimal(&quot;15.0&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (vehicleType.equalsIgnoreCase(&quot;SUV&quot;)) {</b>
+<b class="nc">&nbsp;            if (vehicleAge &gt;= 0 &amp;&amp; vehicleAge &lt;= 5) {</b>
+<b class="nc">&nbsp;                antiquityChargePercentage = new BigDecimal(&quot;0.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (vehicleAge &gt;= 6 &amp;&amp; vehicleAge &lt;= 10) {</b>
+<b class="nc">&nbsp;                antiquityChargePercentage = new BigDecimal(&quot;7.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (vehicleAge &gt;= 11 &amp;&amp; vehicleAge &lt;= 15) {</b>
+<b class="nc">&nbsp;                antiquityChargePercentage = new BigDecimal(&quot;11.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (vehicleAge &gt;= 16) {</b>
+<b class="nc">&nbsp;                antiquityChargePercentage = new BigDecimal(&quot;20.0&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (vehicleType.equalsIgnoreCase(&quot;Pickup&quot;)) {</b>
+<b class="nc">&nbsp;            if (vehicleAge &gt;= 0 &amp;&amp; vehicleAge &lt;= 5) {</b>
+<b class="nc">&nbsp;                antiquityChargePercentage = new BigDecimal(&quot;0.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (vehicleAge &gt;= 6 &amp;&amp; vehicleAge &lt;= 10) {</b>
+<b class="nc">&nbsp;                antiquityChargePercentage = new BigDecimal(&quot;7.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (vehicleAge &gt;= 11 &amp;&amp; vehicleAge &lt;= 15) {</b>
+<b class="nc">&nbsp;                antiquityChargePercentage = new BigDecimal(&quot;11.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (vehicleAge &gt;= 16) {</b>
+<b class="nc">&nbsp;                antiquityChargePercentage = new BigDecimal(&quot;20.0&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (vehicleType.equalsIgnoreCase(&quot;Furgoneta&quot;)) {</b>
+<b class="nc">&nbsp;            if (vehicleAge &gt;= 0 &amp;&amp; vehicleAge &lt;= 5) {</b>
+<b class="nc">&nbsp;                antiquityChargePercentage = new BigDecimal(&quot;0.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (vehicleAge &gt;= 6 &amp;&amp; vehicleAge &lt;= 10) {</b>
+<b class="nc">&nbsp;                antiquityChargePercentage = new BigDecimal(&quot;7.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (vehicleAge &gt;= 11 &amp;&amp; vehicleAge &lt;= 15) {</b>
+<b class="nc">&nbsp;                antiquityChargePercentage = new BigDecimal(&quot;11.0&quot;);</b>
+<b class="nc">&nbsp;            } else if (vehicleAge &gt;= 16) {</b>
+<b class="nc">&nbsp;                antiquityChargePercentage = new BigDecimal(&quot;20.0&quot;);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return antiquityChargePercentage;</b>
+&nbsp;    }
+&nbsp;}
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-19 04:46</div>
+</div>
+</body>
+</html>

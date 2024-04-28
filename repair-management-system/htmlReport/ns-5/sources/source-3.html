@@ -1,0 +1,213 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > DiscountService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.autofix.repairmanagementsystem.services</a>
+</div>
+
+<h1>Coverage Summary for Class: DiscountService (com.autofix.repairmanagementsystem.services)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DiscountService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    53,6%
+  </span>
+  <span class="absValue">
+    (30/56)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.autofix.repairmanagementsystem.services;
+&nbsp;
+&nbsp;import com.autofix.repairmanagementsystem.entities.DiscountEntity;
+&nbsp;import com.autofix.repairmanagementsystem.repositories.DiscountRepository;
+&nbsp;import com.autofix.repairmanagementsystem.repositories.RepairRepository;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;import org.springframework.transaction.annotation.Transactional;
+&nbsp;
+&nbsp;import java.math.BigDecimal;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;@Service
+&nbsp;public class DiscountService {
+&nbsp;
+&nbsp;    private final DiscountRepository discountRepository;
+&nbsp;    private final RepairRepository repairRepository;
+&nbsp;
+&nbsp;
+&nbsp;    @Autowired
+<b class="fc">&nbsp;    public DiscountService(DiscountRepository discountRepository, RepairRepository repairRepository) {</b>
+<b class="fc">&nbsp;        this.discountRepository = discountRepository;</b>
+<b class="fc">&nbsp;        this.repairRepository = repairRepository;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    public DiscountEntity createDiscount(DiscountEntity discount) {
+<b class="fc">&nbsp;        return discountRepository.save(discount);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;DiscountEntity&gt; findAllDiscounts() {
+<b class="fc">&nbsp;        return discountRepository.findAll();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;DiscountEntity&gt; findDiscountById(Long id) {
+<b class="fc">&nbsp;        return discountRepository.findById(id);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    public DiscountEntity updateDiscount(Long id, DiscountEntity discountDetails) {
+<b class="fc">&nbsp;        DiscountEntity discount = discountRepository.findById(id)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new RuntimeException(&quot;Descuento no encontrado con el id: &quot; + id));</b>
+<b class="fc">&nbsp;        discount.setDescription(discountDetails.getDescription());</b>
+<b class="fc">&nbsp;        discount.setAmount(discountDetails.getAmount());</b>
+<b class="fc">&nbsp;        discount.setDiscountType(discountDetails.getDiscountType());</b>
+<b class="fc">&nbsp;        discount.setApplicableBrand(discountDetails.getApplicableBrand());</b>
+<b class="fc">&nbsp;        return discountRepository.save(discount);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    public void deleteDiscount(Long id) {
+<b class="fc">&nbsp;        DiscountEntity discount = discountRepository.findById(id)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new RuntimeException(&quot;Descuento no encontrado con el id: &quot; + id));</b>
+<b class="fc">&nbsp;        discountRepository.delete(discount);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BigDecimal determineDiscountPercentage(Long vehicleId, String engineType) {
+<b class="fc">&nbsp;        LocalDate startDate = LocalDate.now().minusMonths(12);</b>
+<b class="fc">&nbsp;        Long repairCount = repairRepository.countRepairsByVehicleIdAndDateRange(vehicleId, startDate);</b>
+&nbsp;
+<b class="fc">&nbsp;        BigDecimal discountPercentage = BigDecimal.ZERO;</b>
+&nbsp;
+<b class="fc">&nbsp;        if (engineType.equalsIgnoreCase(&quot;GASOLINE&quot;)) {</b>
+<b class="fc">&nbsp;            if (repairCount &gt;= 1 &amp;&amp; repairCount &lt;= 2) {</b>
+<b class="nc">&nbsp;                discountPercentage = new BigDecimal(&quot;5&quot;);</b>
+<b class="fc">&nbsp;            } else if (repairCount &gt;= 3 &amp;&amp; repairCount &lt;= 5) {</b>
+<b class="fc">&nbsp;                discountPercentage = new BigDecimal(&quot;10&quot;);</b>
+<b class="nc">&nbsp;            } else if (repairCount &gt;= 6 &amp;&amp; repairCount &lt;= 9) {</b>
+<b class="nc">&nbsp;                discountPercentage = new BigDecimal(&quot;15&quot;);</b>
+<b class="nc">&nbsp;            } else if (repairCount &gt;= 10) {</b>
+<b class="nc">&nbsp;                discountPercentage = new BigDecimal(&quot;20&quot;);</b>
+&nbsp;            }
+<b class="fc">&nbsp;        } else if (engineType.equalsIgnoreCase(&quot;DIESEL&quot;)) {</b>
+<b class="nc">&nbsp;            if (repairCount &gt;= 1 &amp;&amp; repairCount &lt;= 2) {</b>
+<b class="nc">&nbsp;                discountPercentage = new BigDecimal(&quot;7&quot;);</b>
+<b class="nc">&nbsp;            } else if (repairCount &gt;= 3 &amp;&amp; repairCount &lt;= 5) {</b>
+<b class="nc">&nbsp;                discountPercentage = new BigDecimal(&quot;12&quot;);</b>
+<b class="nc">&nbsp;            } else if (repairCount &gt;= 6 &amp;&amp; repairCount &lt;= 9) {</b>
+<b class="nc">&nbsp;                discountPercentage = new BigDecimal(&quot;17&quot;);</b>
+<b class="nc">&nbsp;            } else if (repairCount &gt;= 10) {</b>
+<b class="nc">&nbsp;                discountPercentage = new BigDecimal(&quot;22&quot;);</b>
+&nbsp;            }
+<b class="fc">&nbsp;        } else if (engineType.equalsIgnoreCase(&quot;HYBRID&quot;)) {</b>
+<b class="nc">&nbsp;            if (repairCount &gt;= 1 &amp;&amp; repairCount &lt;= 2) {</b>
+<b class="nc">&nbsp;                discountPercentage = new BigDecimal(&quot;10&quot;);</b>
+<b class="nc">&nbsp;            } else if (repairCount &gt;= 3 &amp;&amp; repairCount &lt;= 5) {</b>
+<b class="nc">&nbsp;                discountPercentage = new BigDecimal(&quot;15&quot;);</b>
+<b class="nc">&nbsp;            } else if (repairCount &gt;= 6 &amp;&amp; repairCount &lt;= 9) {</b>
+<b class="nc">&nbsp;                discountPercentage = new BigDecimal(&quot;20&quot;);</b>
+<b class="nc">&nbsp;            } else if (repairCount &gt;= 10) {</b>
+<b class="nc">&nbsp;                discountPercentage = new BigDecimal(&quot;25&quot;);</b>
+&nbsp;            }
+<b class="fc">&nbsp;        } else if (engineType.equalsIgnoreCase(&quot;ELECTRIC&quot;)) {</b>
+<b class="fc">&nbsp;            if (repairCount &gt;= 1 &amp;&amp; repairCount &lt;= 2) {</b>
+<b class="nc">&nbsp;                discountPercentage = new BigDecimal(&quot;8&quot;);</b>
+<b class="fc">&nbsp;            } else if (repairCount &gt;= 3 &amp;&amp; repairCount &lt;= 5) {</b>
+<b class="fc">&nbsp;                discountPercentage = new BigDecimal(&quot;13&quot;);</b>
+<b class="nc">&nbsp;            } else if (repairCount &gt;= 6 &amp;&amp; repairCount &lt;= 9) {</b>
+<b class="nc">&nbsp;                discountPercentage = new BigDecimal(&quot;18&quot;);</b>
+<b class="nc">&nbsp;            } else if (repairCount &gt;= 10) {</b>
+<b class="nc">&nbsp;                discountPercentage = new BigDecimal(&quot;23&quot;);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return discountPercentage;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-19 04:46</div>
+</div>
+</body>
+</html>

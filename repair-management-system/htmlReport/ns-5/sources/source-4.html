@@ -1,0 +1,269 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > RepairService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.autofix.repairmanagementsystem.services</a>
+</div>
+
+<h1>Coverage Summary for Class: RepairService (com.autofix.repairmanagementsystem.services)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RepairService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97%
+  </span>
+  <span class="absValue">
+    (64/66)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.autofix.repairmanagementsystem.services;
+&nbsp;
+&nbsp;import com.autofix.repairmanagementsystem.entities.RepairEntity;
+&nbsp;import com.autofix.repairmanagementsystem.entities.RepairTypeEntity;
+&nbsp;import com.autofix.repairmanagementsystem.entities.VehicleEntity;
+&nbsp;import com.autofix.repairmanagementsystem.repositories.RepairRepository;
+&nbsp;import com.autofix.repairmanagementsystem.repositories.RepairTypeRepository;
+&nbsp;import com.autofix.repairmanagementsystem.repositories.VehicleRepository;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;import org.springframework.transaction.annotation.Transactional;
+&nbsp;
+&nbsp;import java.math.BigDecimal;
+&nbsp;import java.time.DayOfWeek;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.time.LocalTime;
+&nbsp;import java.time.temporal.ChronoUnit;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;@Service
+&nbsp;public class RepairService {
+&nbsp;
+&nbsp;    private final RepairRepository repairRepository;
+&nbsp;    private final VehicleRepository vehicleRepository;
+&nbsp;    private final RepairTypeRepository repairTypeRepository;
+&nbsp;    private final DiscountService discountService;
+&nbsp;    private final ChargeService chargeService;
+&nbsp;    private final BonusService bonusService;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    public RepairService(RepairRepository repairRepository, VehicleRepository vehicleRepository,
+&nbsp;                         RepairTypeRepository repairTypeRepository, DiscountService discountService,
+<b class="fc">&nbsp;                         ChargeService chargeService, BonusService bonusService) {</b>
+<b class="fc">&nbsp;        this.repairRepository = repairRepository;</b>
+<b class="fc">&nbsp;        this.vehicleRepository = vehicleRepository;</b>
+<b class="fc">&nbsp;        this.repairTypeRepository = repairTypeRepository;</b>
+<b class="fc">&nbsp;        this.discountService = discountService;</b>
+<b class="fc">&nbsp;        this.chargeService = chargeService;</b>
+<b class="fc">&nbsp;        this.bonusService = bonusService;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    public RepairEntity registerRepair(RepairEntity repair) throws Exception {
+&nbsp;        // Validar la existencia del vehículo asociado y el tipo de reparación, así como la coherencia de las fechas.
+<b class="fc">&nbsp;        validateRepair(repair);</b>
+&nbsp;
+&nbsp;        // Guardar la información de la reparación en la base de datos.
+<b class="fc">&nbsp;        return repairRepository.save(repair);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void validateRepair(RepairEntity repair) throws Exception {
+<b class="fc">&nbsp;        VehicleEntity vehicle = vehicleRepository.findById(repair.getVehicle().getVehicleId())</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new Exception(&quot;Vehículo no encontrado con ID: &quot; + repair.getVehicle().getVehicleId()));</b>
+<b class="fc">&nbsp;        repair.setVehicle(vehicle);</b>
+&nbsp;
+<b class="fc">&nbsp;        RepairTypeEntity repairType = repairTypeRepository.findById(repair.getRepairType().getRepairTypeId())</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new Exception(&quot;Tipo de reparación no encontrado con ID: &quot; + repair.getRepairType().getRepairTypeId()));</b>
+<b class="fc">&nbsp;        repair.setRepairType(repairType);</b>
+&nbsp;
+<b class="fc">&nbsp;        if (repair.getExitDate().isBefore(repair.getEntryDate())) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;La fecha y hora de salida no pueden ser anteriores a la fecha y hora de entrada.&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;RepairEntity&gt; findAllRepairs() {
+<b class="fc">&nbsp;        return repairRepository.findAll();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;RepairEntity&gt; findRepairById(Long repairId) {
+<b class="fc">&nbsp;        return repairRepository.findById(repairId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    public void deleteRepair(Long repairId) throws Exception {
+&nbsp;        // Verificar si la reparación existe
+<b class="fc">&nbsp;        RepairEntity repair = repairRepository.findById(repairId)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new Exception(&quot;Reparación no encontrada con ID: &quot; + repairId));</b>
+<b class="fc">&nbsp;        repairRepository.deleteById(repairId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;RepairEntity&gt; findRepairsByVehicleId(Long vehicleId) {
+<b class="fc">&nbsp;        return repairRepository.findByVehicleVehicleId(vehicleId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BigDecimal calculateDayOfWeekDiscount(LocalDate entryDate, LocalTime entryTime) {
+<b class="fc">&nbsp;        DayOfWeek dayOfWeek = entryDate.getDayOfWeek();</b>
+<b class="fc">&nbsp;        BigDecimal discountPercentage = BigDecimal.ZERO;</b>
+&nbsp;
+&nbsp;        // Verifica si es lunes o jueves
+<b class="fc">&nbsp;        boolean isDiscountDay = dayOfWeek == DayOfWeek.MONDAY || dayOfWeek == DayOfWeek.THURSDAY;</b>
+&nbsp;
+&nbsp;        // Verifica si la hora está entre las 09:00 y las 12:00
+<b class="fc">&nbsp;        LocalTime startTime = LocalTime.of(9, 0);</b>
+<b class="fc">&nbsp;        LocalTime endTime = LocalTime.of(12, 0);</b>
+<b class="fc">&nbsp;        boolean isInTimeRange = !entryTime.isBefore(startTime) &amp;&amp; entryTime.isBefore(endTime);</b>
+&nbsp;
+&nbsp;        // Si cumple ambos criterios, se aplica un descuento del 10%
+<b class="fc">&nbsp;        if (isDiscountDay &amp;&amp; isInTimeRange) {</b>
+<b class="fc">&nbsp;            discountPercentage = new BigDecimal(&quot;10&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return discountPercentage;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BigDecimal calculatePickupDelayCharge(Long repairId) {
+<b class="fc">&nbsp;        RepairEntity repair = repairRepository.findById(repairId)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new RuntimeException(&quot;Reparación no encontrada con ID: &quot; + repairId));</b>
+&nbsp;
+<b class="fc">&nbsp;        LocalDate readyDate = repair.getExitDate();</b>
+<b class="fc">&nbsp;        LocalDate pickupDate = repair.getCustomerPickupDate();</b>
+<b class="fc">&nbsp;        long daysDelayed = ChronoUnit.DAYS.between(readyDate, pickupDate);</b>
+&nbsp;
+<b class="fc">&nbsp;        if (daysDelayed &lt;= 0) {</b>
+<b class="nc">&nbsp;            return BigDecimal.ZERO;</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            BigDecimal totalRepairCost = repair.getRepairCost();</b>
+<b class="fc">&nbsp;            BigDecimal dailyDelayChargePercentage = new BigDecimal(&quot;0.05&quot;); // 5%</b>
+<b class="fc">&nbsp;            BigDecimal delayCharge = totalRepairCost.multiply(dailyDelayChargePercentage).multiply(new BigDecimal(daysDelayed));</b>
+&nbsp;
+<b class="fc">&nbsp;            return delayCharge;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    public BigDecimal calculateTotalRepairCost(Long repairId) throws Exception {
+<b class="fc">&nbsp;        RepairEntity repair = findRepairById(repairId)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new Exception(&quot;Reparación no encontrada con ID: &quot; + repairId));</b>
+&nbsp;
+<b class="fc">&nbsp;        BigDecimal baseRepairCost = repair.getRepairCost(); // Costo base de la reparación</b>
+<b class="fc">&nbsp;        BigDecimal totalCharges = BigDecimal.ZERO; // Inicialización de los recargos totales</b>
+<b class="fc">&nbsp;        BigDecimal totalDiscounts = BigDecimal.ZERO; // Inicialización de los descuentos totales</b>
+&nbsp;
+&nbsp;        // Calculo de descuentos aplicables
+<b class="fc">&nbsp;        BigDecimal dayOfWeekDiscount = calculateDayOfWeekDiscount(repair.getEntryDate(), repair.getEntryTime());</b>
+<b class="fc">&nbsp;        BigDecimal discountAmount = baseRepairCost.multiply(dayOfWeekDiscount.divide(new BigDecimal(100)));</b>
+<b class="fc">&nbsp;        totalDiscounts = totalDiscounts.add(discountAmount);</b>
+&nbsp;
+<b class="fc">&nbsp;        BigDecimal additionalDiscount = discountService.determineDiscountPercentage(repair.getVehicle().getVehicleId(), repair.getVehicle().getEngineType());</b>
+<b class="fc">&nbsp;        BigDecimal additionalDiscountAmount = baseRepairCost.multiply(additionalDiscount.divide(new BigDecimal(100)));</b>
+<b class="fc">&nbsp;        totalDiscounts = totalDiscounts.add(additionalDiscountAmount);</b>
+&nbsp;
+&nbsp;        // Calculo de recargos aplicables
+<b class="fc">&nbsp;        BigDecimal pickupDelayCharge = calculatePickupDelayCharge(repairId);</b>
+<b class="fc">&nbsp;        totalCharges = totalCharges.add(pickupDelayCharge);</b>
+&nbsp;
+<b class="fc">&nbsp;        BigDecimal mileageChargePercentage = chargeService.determineMileageChargePercentage(repair.getVehicle().getVehicleId());</b>
+<b class="fc">&nbsp;        BigDecimal mileageCharge = baseRepairCost.multiply(mileageChargePercentage.divide(new BigDecimal(100)));</b>
+<b class="fc">&nbsp;        totalCharges = totalCharges.add(mileageCharge);</b>
+&nbsp;
+&nbsp;        // Calculo de bonos aplicables si corresponde
+<b class="fc">&nbsp;        BigDecimal bonusAmount = bonusService.calculateBonusForVehicle(repair.getVehicle().getVehicleId());</b>
+<b class="fc">&nbsp;        totalDiscounts = totalDiscounts.add(bonusAmount);</b>
+&nbsp;
+&nbsp;        // Cálculo final
+<b class="fc">&nbsp;        BigDecimal totalAfterDiscounts = baseRepairCost.subtract(totalDiscounts);</b>
+<b class="fc">&nbsp;        BigDecimal totalAfterCharges = totalAfterDiscounts.add(totalCharges);</b>
+&nbsp;
+&nbsp;        // IVA del 19%
+<b class="fc">&nbsp;        BigDecimal tax = totalAfterCharges.multiply(new BigDecimal(&quot;0.19&quot;));</b>
+<b class="fc">&nbsp;        BigDecimal totalWithTax = totalAfterCharges.add(tax);</b>
+&nbsp;
+<b class="fc">&nbsp;        return totalWithTax;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-19 04:46</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,173 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ReportService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.autofix.repairmanagementsystem.services</a>
+</div>
+
+<h1>Coverage Summary for Class: ReportService (com.autofix.repairmanagementsystem.services)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ReportService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66,7%
+  </span>
+  <span class="absValue">
+    (4/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16,7%
+  </span>
+  <span class="absValue">
+    (4/24)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.autofix.repairmanagementsystem.services;
+&nbsp;
+&nbsp;import com.autofix.repairmanagementsystem.dto.AverageRepairTimeDTO;
+&nbsp;import com.autofix.repairmanagementsystem.dto.RepairTypeMotorSummaryDTO;
+&nbsp;import com.autofix.repairmanagementsystem.dto.RepairTypeSummaryDTO;
+&nbsp;import com.autofix.repairmanagementsystem.entities.RepairEntity;
+&nbsp;import com.autofix.repairmanagementsystem.entities.VehicleEntity;
+&nbsp;import com.autofix.repairmanagementsystem.dto.RepairCostReportDTO;
+&nbsp;import com.autofix.repairmanagementsystem.repositories.RepairRepository;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import java.math.BigDecimal;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@Service
+<b class="fc">&nbsp;public class ReportService {</b>
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private RepairService repairService;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private VehicleService vehicleService;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private RepairRepository repairRepository;
+&nbsp;
+&nbsp;    public List&lt;RepairCostReportDTO&gt; generateRepairCostReport() {
+<b class="nc">&nbsp;        List&lt;VehicleEntity&gt; vehicles = vehicleService.findAllVehicles();</b>
+<b class="nc">&nbsp;        List&lt;RepairCostReportDTO&gt; reports = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (VehicleEntity vehicle : vehicles) {</b>
+<b class="nc">&nbsp;            List&lt;RepairEntity&gt; repairs = repairService.findRepairsByVehicleId(vehicle.getVehicleId());</b>
+<b class="nc">&nbsp;            BigDecimal totalCost = calculateTotalCost(repairs);</b>
+<b class="nc">&nbsp;            reports.add(new RepairCostReportDTO(</b>
+<b class="nc">&nbsp;                    vehicle.getVehicleId(),</b>
+<b class="nc">&nbsp;                    vehicle.getBrand() + &quot; &quot; + vehicle.getModel(),</b>
+&nbsp;                    totalCost,
+<b class="nc">&nbsp;                    repairs.size()</b>
+&nbsp;            ));
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return reports;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private BigDecimal calculateTotalCost(List&lt;RepairEntity&gt; repairs) {
+<b class="nc">&nbsp;        BigDecimal total = BigDecimal.ZERO;</b>
+<b class="nc">&nbsp;        for (RepairEntity repair : repairs) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                BigDecimal repairCost = repairService.calculateTotalRepairCost(repair.getRepairId());</b>
+<b class="nc">&nbsp;                total = total.add(repairCost);</b>
+<b class="nc">&nbsp;            } catch (Exception e) {</b>
+<b class="nc">&nbsp;                System.err.println(&quot;Error calculating repair cost for repair ID &quot; + repair.getRepairId() + &quot;: &quot; + e.getMessage());</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return total;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;RepairTypeSummaryDTO&gt; generateRepairTypeSummaryReport() {
+<b class="fc">&nbsp;        return repairRepository.findRepairTypesSummary();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;AverageRepairTimeDTO&gt; generateAverageRepairTimeReport() {
+<b class="fc">&nbsp;        return repairRepository.findAverageRepairTimesByBrand();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;RepairTypeMotorSummaryDTO&gt; generateRepairTypeMotorReport() {
+<b class="fc">&nbsp;        return repairRepository.findRepairTypesAndEngineSummary();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-19 04:46</div>
+</div>
+</body>
+</html>

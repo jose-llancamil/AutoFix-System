@@ -1,0 +1,170 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > RepairTypeController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.autofix.repairmanagementsystem.controllers</a>
+</div>
+
+<h1>Coverage Summary for Class: RepairTypeController (com.autofix.repairmanagementsystem.controllers)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RepairTypeController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (16/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.autofix.repairmanagementsystem.controllers;
+&nbsp;
+&nbsp;import com.autofix.repairmanagementsystem.entities.RepairTypeEntity;
+&nbsp;import com.autofix.repairmanagementsystem.services.RepairTypeService;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/api/v1/repair-types&quot;)
+&nbsp;public class RepairTypeController {
+&nbsp;
+&nbsp;    private final RepairTypeService repairTypeService;
+&nbsp;
+&nbsp;    @Autowired
+<b class="fc">&nbsp;    public RepairTypeController(RepairTypeService repairTypeService) {</b>
+<b class="fc">&nbsp;        this.repairTypeService = repairTypeService;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PostMapping
+&nbsp;    public ResponseEntity&lt;RepairTypeEntity&gt; createRepairType(@RequestBody RepairTypeEntity repairType) {
+&nbsp;        try {
+<b class="fc">&nbsp;            RepairTypeEntity savedRepairType = repairTypeService.createOrUpdateRepairType(repairType);</b>
+<b class="fc">&nbsp;            return ResponseEntity.status(HttpStatus.CREATED).body(savedRepairType);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().build();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping
+&nbsp;    public ResponseEntity&lt;List&lt;RepairTypeEntity&gt;&gt; getAllRepairTypes() {
+<b class="fc">&nbsp;        List&lt;RepairTypeEntity&gt; repairTypes = repairTypeService.findAllRepairTypes();</b>
+<b class="fc">&nbsp;        return repairTypes.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(repairTypes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;RepairTypeEntity&gt; getRepairTypeById(@PathVariable(&quot;id&quot;) Long id) {
+<b class="fc">&nbsp;        return repairTypeService.findRepairTypeById(id)</b>
+<b class="fc">&nbsp;                .map(ResponseEntity::ok)</b>
+<b class="fc">&nbsp;                .orElseGet(() -&gt; ResponseEntity.notFound().build());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PutMapping(&quot;/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;RepairTypeEntity&gt; updateRepairType(@PathVariable(&quot;id&quot;) Long id, @RequestBody RepairTypeEntity repairType) {
+&nbsp;        try {
+<b class="fc">&nbsp;            repairType.setRepairTypeId(id);</b>
+<b class="fc">&nbsp;            RepairTypeEntity updatedRepairType = repairTypeService.createOrUpdateRepairType(repairType);</b>
+<b class="fc">&nbsp;            return ResponseEntity.ok(updatedRepairType);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().build();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @DeleteMapping(&quot;/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;HttpStatus&gt; deleteRepairType(@PathVariable(&quot;id&quot;) Long id) {
+&nbsp;        try {
+<b class="fc">&nbsp;            repairTypeService.deleteRepairType(id);</b>
+<b class="fc">&nbsp;            return ResponseEntity.noContent().build();</b>
+<b class="fc">&nbsp;        } catch (Exception e) {</b>
+<b class="fc">&nbsp;            return ResponseEntity.internalServerError().build();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-19 04:46</div>
+</div>
+</body>
+</html>
