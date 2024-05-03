@@ -84,4 +84,36 @@ public class BonusServiceTest {
         BigDecimal result = bonusService.calculateBonusForVehicle(1L);
         assertThat(result).isEqualTo(BigDecimal.ZERO);
     }
+
+    @Test
+    void updateBonus_Success() {
+        when(bonusRepository.findById(1L)).thenReturn(Optional.of(bonus));
+        when(bonusRepository.save(any(BonusEntity.class))).thenReturn(bonus);
+
+        BonusEntity updatedBonus = bonusService.updateBonus(1L, bonus);
+        assertThat(updatedBonus.getDescription()).isEqualTo("Description of bonus");
+        verify(bonusRepository).save(bonus);
+    }
+
+    @Test
+    void applyBonusToVehicle_VehicleNotFound() {
+        when(vehicleRepository.findById(1L)).thenReturn(Optional.empty());
+        assertThrows(IllegalArgumentException.class, () -> bonusService.applyBonusToVehicle(1L, "Toyota"));
+    }
+
+    @Test
+    void applyBonusToVehicle_NoBonusAvailable() {
+        when(vehicleRepository.findById(1L)).thenReturn(Optional.of(vehicle));
+        when(bonusRepository.findByVehicle_VehicleId(1L)).thenReturn(Optional.empty());
+        when(bonusRepository.findFirstByBrandAndVehicleIsNull("Toyota")).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> bonusService.applyBonusToVehicle(1L, "Toyota"));
+    }
+
+    @Test
+    void calculateBonusForVehicle_BonusFound() {
+        when(bonusRepository.findByVehicle_VehicleId(1L)).thenReturn(Optional.of(bonus));
+        BigDecimal result = bonusService.calculateBonusForVehicle(1L);
+        assertThat(result).isEqualTo(new BigDecimal("100.00"));
+    }
 }

@@ -85,4 +85,40 @@ public class DiscountControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         verify(discountService).deleteDiscount(1L);
     }
+
+    @Test
+    void createDiscount_ReturnsBadRequestWhenExceptionThrown() {
+        when(discountService.createDiscount(any(DiscountEntity.class))).thenThrow(RuntimeException.class);
+        ResponseEntity<DiscountEntity> response = discountController.createDiscount(new DiscountEntity());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void updateDiscount_ReturnsBadRequestWhenUpdateFails() {
+        when(discountService.updateDiscount(eq(1L), any(DiscountEntity.class))).thenThrow(RuntimeException.class);
+        ResponseEntity<DiscountEntity> response = discountController.updateDiscount(1L, new DiscountEntity());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void deleteDiscount_ReturnsInternalServerErrorWhenExceptionThrown() {
+        doThrow(RuntimeException.class).when(discountService).deleteDiscount(1L);
+        ResponseEntity<Void> response = discountController.deleteDiscount(1L);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    void getAllDiscounts_ReturnsNoContentWhenEmptyList() {
+        when(discountService.findAllDiscounts()).thenReturn(Arrays.asList());
+        ResponseEntity<List<DiscountEntity>> response = discountController.getAllDiscounts();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    void createDiscount_ReturnsBadRequestOnInvalidInput() {
+        DiscountEntity invalidDiscount = new DiscountEntity();  // Assuming required fields are missing
+        when(discountService.createDiscount(invalidDiscount)).thenThrow(new IllegalArgumentException("Invalid discount data"));
+        ResponseEntity<DiscountEntity> response = discountController.createDiscount(invalidDiscount);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
 }

@@ -3,7 +3,10 @@ package com.autofix.repairmanagementsystem.services;
 import com.autofix.repairmanagementsystem.dto.AverageRepairTimeDTO;
 import com.autofix.repairmanagementsystem.dto.RepairTypeMotorSummaryDTO;
 import com.autofix.repairmanagementsystem.dto.RepairTypeSummaryDTO;
+import com.autofix.repairmanagementsystem.entities.RepairEntity;
+import com.autofix.repairmanagementsystem.entities.VehicleEntity;
 import com.autofix.repairmanagementsystem.repositories.RepairRepository;
+import com.autofix.repairmanagementsystem.dto.RepairCostReportDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +18,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -83,5 +87,75 @@ public class ReportServiceTest {
 
         // Assert
         assertEquals(expected, result);
+    }
+
+    @Test
+    void generateRepairCostReport_ShouldReturnEmptyListWhenNoVehicles() {
+        // Arrange
+        when(vehicleService.findAllVehicles()).thenReturn(Arrays.asList());
+
+        // Act
+        List<RepairCostReportDTO> result = reportService.generateRepairCostReport();
+
+        // Assert
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void generateRepairCostReport_ShouldHandleExceptionsInCostCalculation() throws Exception {
+        // Arrange
+        List<VehicleEntity> vehicles = Arrays.asList(new VehicleEntity());
+        vehicles.get(0).setVehicleId(1L);
+        vehicles.get(0).setBrand("Brand");
+        vehicles.get(0).setModel("Model");
+
+        List<RepairEntity> repairs = Arrays.asList(new RepairEntity());
+        repairs.get(0).setRepairId(1L);
+
+        when(vehicleService.findAllVehicles()).thenReturn(vehicles);
+        when(repairService.findRepairsByVehicleId(1L)).thenReturn(repairs);
+        when(repairService.calculateTotalRepairCost(1L)).thenThrow(new RuntimeException("Error"));
+
+        // Act
+        List<RepairCostReportDTO> result = reportService.generateRepairCostReport();
+
+        // Assert
+        assertEquals(BigDecimal.ZERO, result.get(0).getTotalCost()); // Assuming you handle the error and set cost to 0
+    }
+
+    @Test
+    void generateRepairTypeSummaryReport_ShouldReturnEmptyListWhenNoData() {
+        // Arrange
+        when(repairRepository.findRepairTypesSummary()).thenReturn(Arrays.asList());
+
+        // Act
+        List<RepairTypeSummaryDTO> result = reportService.generateRepairTypeSummaryReport();
+
+        // Assert
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void generateAverageRepairTimeReport_ShouldReturnEmptyListWhenNoData() {
+        // Arrange
+        when(repairRepository.findAverageRepairTimesByBrand()).thenReturn(Arrays.asList());
+
+        // Act
+        List<AverageRepairTimeDTO> result = reportService.generateAverageRepairTimeReport();
+
+        // Assert
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void generateRepairTypeMotorReport_ShouldReturnEmptyListWhenNoData() {
+        // Arrange
+        when(repairRepository.findRepairTypesAndEngineSummary()).thenReturn(Arrays.asList());
+
+        // Act
+        List<RepairTypeMotorSummaryDTO> result = reportService.generateRepairTypeMotorReport();
+
+        // Assert
+        assertTrue(result.isEmpty());
     }
 }

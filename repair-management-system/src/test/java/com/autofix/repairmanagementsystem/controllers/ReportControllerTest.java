@@ -2,6 +2,7 @@ package com.autofix.repairmanagementsystem.controllers;
 
 import com.autofix.repairmanagementsystem.dto.AverageRepairTimeDTO;
 import com.autofix.repairmanagementsystem.dto.RepairCostReportDTO;
+import com.autofix.repairmanagementsystem.dto.RepairTypeMotorSummaryDTO;
 import com.autofix.repairmanagementsystem.dto.RepairTypeSummaryDTO;
 import com.autofix.repairmanagementsystem.services.ReportService;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +20,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 public class ReportControllerTest {
@@ -87,5 +89,40 @@ public class ReportControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].brand").value("Ford"));
+    }
+
+    @Test
+    public void getRepairCostReport_ReturnsInternalServerError_OnException() throws Exception {
+        when(reportService.generateRepairCostReport()).thenThrow(new RuntimeException("Database error"));
+        mockMvc.perform(get("/api/v1/reports/repair-costs"))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    public void getRepairTypeSummaryReport_ReturnsInternalServerError_OnException() throws Exception {
+        when(reportService.generateRepairTypeSummaryReport()).thenThrow(new RuntimeException("Database error"));
+        mockMvc.perform(get("/api/v1/reports/repair-type-summary"))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    public void getRepairTypeSummaryReport_ReturnsNoContent_WhenEmpty() throws Exception {
+        when(reportService.generateRepairTypeSummaryReport()).thenReturn(Collections.emptyList());
+        mockMvc.perform(get("/api/v1/reports/repair-type-summary"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void getAverageRepairTimesReport_ReturnsNoContent_WhenEmpty() throws Exception {
+        when(reportService.generateAverageRepairTimeReport()).thenReturn(Collections.emptyList());
+        mockMvc.perform(get("/api/v1/reports/average-repair-times"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void getRepairTypesEngineSummary_ReturnsNoContent_WhenEmpty() throws Exception {
+        when(reportService.generateRepairTypeMotorReport()).thenReturn(Collections.emptyList());
+        mockMvc.perform(get("/api/v1/reports/repair-types-engine-summary"))
+                .andExpect(status().isNoContent());
     }
 }

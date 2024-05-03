@@ -86,4 +86,33 @@ public class ChargeControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         verify(chargeService).deleteCharge(1L);
     }
+
+    @Test
+    void updateCharge_ReturnsBadRequestOnException() {
+        when(chargeService.updateCharge(eq(1L), any(ChargeEntity.class))).thenThrow(new RuntimeException("Unexpected error"));
+        ResponseEntity<ChargeEntity> response = chargeController.updateCharge(1L, charge);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void deleteCharge_ReturnsInternalServerErrorOnException() {
+        doThrow(new RuntimeException("Unexpected error")).when(chargeService).deleteCharge(1L);
+        ResponseEntity<Void> response = chargeController.deleteCharge(1L);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    void createCharge_ReturnsBadRequestOnInvalidInput() {
+        when(chargeService.createCharge(any(ChargeEntity.class))).thenThrow(new IllegalArgumentException("Invalid charge details"));
+        ResponseEntity<ChargeEntity> response = chargeController.createCharge(new ChargeEntity());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void updateCharge_ReturnsNotFoundWhenChargeDoesNotExist() {
+        when(chargeService.updateCharge(eq(1L), any(ChargeEntity.class))).thenThrow(new IllegalArgumentException("Charge not found"));
+        ResponseEntity<ChargeEntity> response = chargeController.updateCharge(1L, new ChargeEntity());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNull();
+    }
 }

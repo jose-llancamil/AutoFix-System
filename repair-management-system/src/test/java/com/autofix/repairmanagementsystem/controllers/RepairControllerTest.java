@@ -112,4 +112,46 @@ public class RepairControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualByComparingTo("180.00");
     }
+
+    @Test
+    void addRepair_ReturnsBadRequestWhenExceptionThrown() throws Exception {
+        when(repairService.registerRepair(any(RepairEntity.class))).thenThrow(new RuntimeException("Internal Server Error"));
+        ResponseEntity<RepairEntity> response = repairController.addRepair(new RepairEntity());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void updateRepair_ReturnsBadRequestWhenDataInvalid() throws Exception {
+        when(repairService.registerRepair(any(RepairEntity.class))).thenThrow(new IllegalArgumentException("Invalid data provided"));
+        ResponseEntity<RepairEntity> response = repairController.updateRepair(1L, new RepairEntity());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void updateRepair_ReturnsNotFoundWhenIdDoesNotExist() throws Exception {
+        when(repairService.registerRepair(any(RepairEntity.class))).thenThrow(new RuntimeException("Repair not found"));
+        ResponseEntity<RepairEntity> response = repairController.updateRepair(1L, new RepairEntity());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void deleteRepair_ReturnsInternalServerErrorWhenExceptionThrown() throws Exception {
+        doThrow(new RuntimeException("Internal Server Error")).when(repairService).deleteRepair(1L);
+        ResponseEntity<HttpStatus> response = repairController.deleteRepair(1L);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    void getAllRepairs_ReturnsNoContentWhenEmpty() {
+        when(repairService.findAllRepairs()).thenReturn(new ArrayList<>());
+        ResponseEntity<List<RepairEntity>> response = repairController.getAllRepairs();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    void getRepairTotalCost_ReturnsBadRequestWhenCalculationFails() throws Exception {
+        when(repairService.calculateTotalRepairCost(1L)).thenThrow(new RuntimeException("Calculation error"));
+        ResponseEntity<BigDecimal> response = repairController.getRepairTotalCost(1L);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
 }

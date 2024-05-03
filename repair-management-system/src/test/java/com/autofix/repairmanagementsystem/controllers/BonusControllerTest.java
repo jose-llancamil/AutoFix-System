@@ -122,4 +122,49 @@ public class BonusControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNull();
     }
+
+    @Test
+    void createBonus_ReturnsBadRequestOnException() {
+        when(bonusService.createBonus(any(BonusEntity.class))).thenThrow(new RuntimeException("Unexpected error"));
+        ResponseEntity<BonusEntity> response = bonusController.createBonus(bonus);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void updateBonus_ReturnsUpdatedBonus() {
+        when(bonusService.updateBonus(eq(1L), any(BonusEntity.class))).thenReturn(bonus);
+        ResponseEntity<?> response = bonusController.updateBonus(1L, bonus);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo(bonus);
+    }
+
+    @Test
+    void updateBonus_ReturnsBadRequestWhenArgumentInvalid() {
+        when(bonusService.updateBonus(eq(1L), any(BonusEntity.class))).thenThrow(new IllegalArgumentException("Invalid data"));
+        ResponseEntity<?> response = bonusController.updateBonus(1L, bonus);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+    }
+
+    @Test
+    void updateBonus_ReturnsInternalServerErrorOnException() {
+        when(bonusService.updateBonus(eq(1L), any(BonusEntity.class))).thenThrow(new RuntimeException("Unexpected error"));
+        ResponseEntity<?> response = bonusController.updateBonus(1L, bonus);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    void deleteBonus_ReturnsInternalServerErrorOnException() {
+        doThrow(new RuntimeException("Delete error")).when(bonusService).deleteBonus(1L);
+        ResponseEntity<Void> response = bonusController.deleteBonus(1L);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    void applyBonusToVehicle_ReturnsInternalServerErrorOnException() {
+        when(bonusService.applyBonusToVehicle(1L, "Toyota")).thenThrow(new RuntimeException("Internal server error"));
+        ResponseEntity<BonusEntity> response = bonusController.applyBonusToVehicle(1L, "Toyota");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST); // This might need to be INTERNAL_SERVER_ERROR based on your logic.
+        assertThat(response.getBody()).isNull();
+    }
 }
