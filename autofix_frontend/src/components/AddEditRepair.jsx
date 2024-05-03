@@ -191,7 +191,7 @@ const AddEditRepair = () => {
                 <TextField label="Costo de Reparación" type="number" value={repairCost} onChange={e => setRepairCost(e.target.value)} sx={{ mb: 1 }} />
             </FormControl>
             <Button variant="contained" color="primary" type="submit" startIcon={<SaveIcon />} sx={{ mt: 2 }}>
-                Guardar
+                Guardar Reparación
             </Button>
             <hr />
         </Box>
